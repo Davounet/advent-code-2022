@@ -9,7 +9,7 @@ type State = {
 }
 
 async function main() {
-  const input = await loadInput('10t')
+  const input = await loadInput('10')
 
   const state: State = {
     cycle: 1,
@@ -18,7 +18,7 @@ async function main() {
     strengths: [],
     nextStrength: 20,
 
-    CRT: [[], [], [], [], [], [], []]
+    CRT: [[], [], [], [], [], []]
   }
 
   input.forEach((row) => {
