@@ -5,9 +5,10 @@ type Position = {
   y: number
   o: 'r' | 'd' | 'l' | 'u'
 }
+const orientations: ('r' | 'd' | 'l' | 'u')[] = ['r', 'd', 'l', 'u']
 
 async function main() {
-  const input = await loadInput('22t', false)
+  const input = await loadInput('22', false)
 
   const rawMap = input.slice(0, input.length - 2)
   const max = {
@@ -26,7 +27,8 @@ async function main() {
   }
 
   directions.forEach((order) => (current = handleOrder(order, current, map, max)))
-  console.log(current)
+  const part1 = currentToPassword(current)
+  console.log(`Password for part1: ${part1}`)
 }
 
 function handleOrder(order, current: Position, map: string[][], max): Position {
@@ -40,28 +42,28 @@ function handleOrder(order, current: Position, map: string[][], max): Position {
   }
 }
 function move(current: Position, map: string[][], max): Position {
-  console.log('moving')
-  let target: [number, number] = [0, 0]
-  if (current.o === 'r') target = [current.x + 1, current.y]
-  if (current.o === 'd') target = [current.x, current.y + 1]
-  if (current.o === 'l') target = [current.x - 1, current.y]
-  if (current.o === 'u') target = [current.x, current.y - 1]
+  let target: { x: number; y: number } = { x: 0, y: 0 }
+  if (current.o === 'r') target = { x: current.x + 1, y: current.y }
+  if (current.o === 'd') target = { x: current.x, y: current.y + 1 }
+  if (current.o === 'l') target = { x: current.x - 1, y: current.y }
+  if (current.o === 'u') target = { x: current.x, y: current.y - 1 }
 
-  // This is not working
-  while ((map?.[target[1]]?.[target[0]] ?? '_') === '_') {
-    if (current.o === 'r') target[0] = (target[0] + 1 + max.x) % max.x
-    if (current.o === 'd') target[1] = (target[1] + 1 + max.y) % max.y
-    if (current.o === 'l') target[0] = (target[0] - 1 + max.x) % max.x
-    if (current.o === 'u') target[1] = (target[1] - 1 + max.y) % max.y
+  while ((map?.[target.y]?.[target.x] ?? '_') === '_') {
+    if (current.o === 'r') target.x = (target.x + 1 + max.x) % max.x
+    if (current.o === 'd') target.y = (target.y + 1 + max.y) % max.y
+    if (current.o === 'l') target.x = (target.x - 1 + max.x) % max.x
+    if (current.o === 'u') target.y = (target.y - 1 + max.y) % max.y
   }
-  if (map[target[1]][target[0]] === '.') return { x: target[1], y: target[0], o: current.o }
+  if (map[target.y][target.x] === '.') return { x: target.x, y: target.y, o: current.o }
   return { ...current }
 }
 function rotate(order, current: Position): Position {
-  console.log('rotating')
-  const orientations: ('r' | 'd' | 'l' | 'u')[] = ['r', 'd', 'l', 'u']
   const index = (orientations.indexOf(current.o) + 4 + (order === 'L' ? -1 : 1)) % 4
   return { ...current, o: orientations[index] }
+}
+
+function currentToPassword(current: Position): number {
+  return 1000 * (current.y + 1) + 4 * (current.x + 1) + orientations.indexOf(current.o)
 }
 
 main()
